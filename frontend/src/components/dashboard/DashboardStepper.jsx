@@ -1,9 +1,9 @@
 import React from 'react';
-import { CircleCheck } from 'lucide-react';
+import { CircleCheck, Clock } from 'lucide-react';
 import { useRegistration } from '../../context/RegistrationContext';
 
 const DashboardStepper = () => {
-  const { isFormWizard, currentStepIndex, steps } = useRegistration();
+  const { isFormWizard, currentStepIndex, steps, isStepFilled } = useRegistration();
 
   if (!isFormWizard) return null;
 
@@ -19,23 +19,36 @@ const DashboardStepper = () => {
         {steps.map((s, idx) => {
           const isPast = idx < currentStepIndex;
           const isActive = idx === currentStepIndex;
+          const isFilled = isStepFilled(s.key);
           
           return (
             <div key={s.key} className="flex flex-col items-center">
               <div 
                 className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-normal transition-all duration-200 border-2 ${
                   isPast 
-                    ? 'border-green-600 bg-green-600 text-white' 
+                    ? isFilled
+                      ? 'border-green-600 bg-green-600 text-white' 
+                      : 'border-amber-500 bg-amber-500 text-white'
                     : isActive 
                     ? 'border-green-600 text-green-600 ring-4 ring-green-50 bg-white' 
                     : 'border-slate-300 text-slate-800 bg-white'
                 }`}
               >
-                {isPast ? <CircleCheck size={16} /> : s.num}
+                {isPast ? (
+                  isFilled ? <CircleCheck size={16} /> : <Clock size={16} />
+                ) : (
+                  s.num
+                )}
               </div>
               <span 
                 className={`hidden md:block text-sm font-normal mt-3 tracking-tight ${
-                  isActive ? 'text-green-600' : isPast ? 'text-slate-700' : 'text-slate-800'
+                  isActive 
+                    ? 'text-green-600 font-medium' 
+                    : isPast 
+                    ? isFilled 
+                      ? 'text-slate-700' 
+                      : 'text-amber-600 font-medium' 
+                    : 'text-slate-800'
                 }`}
               >
                 {s.name}

@@ -39,16 +39,7 @@ export const RegistrationProvider = ({ children }) => {
   const [ownerImageUrl, setOwnerImageUrl] = useState('');
   const [ownerSignatureUrl, setOwnerSignatureUrl] = useState('');
 
-  // Media Details
-  const [mediaName, setMediaName] = useState('');
-  const [mediaAddress, setMediaAddress] = useState('');
-  const [mediaAadharCardNumber, setMediaAadharCardNumber] = useState('');
-  const [mediaPanCardNumber, setMediaPanCardNumber] = useState('');
-  const [mediaMobile, setMediaMobile] = useState('');
-  const [mediaEmail, setMediaEmail] = useState('');
-  const [mediaType, setMediaType] = useState('Image');
-  const [mediaDescription, setMediaDescription] = useState('');
-  const [mediaUrl, setMediaUrl] = useState('');
+
 
   // Step 3 Working Authority Form fields
   const [authorityType, setAuthorityType] = useState('Company');
@@ -77,10 +68,8 @@ export const RegistrationProvider = ({ children }) => {
   const [uploadError, setUploadError] = useState('');
   const [uploadingOwnerImage, setUploadingOwnerImage] = useState(false);
   const [uploadingSignature, setUploadingSignature] = useState(false);
-  const [uploadingMediaFile, setUploadingMediaFile] = useState(false);
   const [ownerImageError, setOwnerImageError] = useState('');
   const [signatureError, setSignatureError] = useState('');
-  const [mediaFileError, setMediaFileError] = useState('');
 
   // Submit status states
   const [submittingForm, setSubmittingForm] = useState(false);
@@ -169,17 +158,7 @@ export const RegistrationProvider = ({ children }) => {
           setOwnerEmail(owner.email || '');
           setOwnerImageUrl(owner.ownerImageUrl || '');
           setOwnerSignatureUrl(owner.signatureUrl || '');
-          if (owner.mediaDetails) {
-            setMediaName(owner.mediaDetails.name || '');
-            setMediaAddress(owner.mediaDetails.address || '');
-            setMediaAadharCardNumber(owner.mediaDetails.aadharCardNumber || '');
-            setMediaPanCardNumber(owner.mediaDetails.panCardNumber || '');
-            setMediaMobile(owner.mediaDetails.mobileNumber || '');
-            setMediaEmail(owner.mediaDetails.email || '');
-            setMediaType(owner.mediaDetails.mediaType || 'Image');
-            setMediaDescription(owner.mediaDetails.mediaDescription || '');
-            setMediaUrl(owner.mediaDetails.mediaUrl || '');
-          }
+
         }
 
         const auth = data.workingAuthority;
@@ -243,14 +222,12 @@ export const RegistrationProvider = ({ children }) => {
       if (type === 'article') setUploadError(sizeMsg);
       if (type === 'owner') setOwnerImageError(sizeMsg);
       if (type === 'signature') setSignatureError(sizeMsg);
-      if (type === 'media') setMediaFileError(sizeMsg);
       return;
     }
 
     if (type === 'article') { setUploadingImage(true); setUploadError(''); }
     if (type === 'owner') { setUploadingOwnerImage(true); setOwnerImageError(''); }
     if (type === 'signature') { setUploadingSignature(true); setSignatureError(''); }
-    if (type === 'media') { setUploadingMediaFile(true); setMediaFileError(''); }
 
     const formData = new FormData();
     formData.append('image', file);
@@ -267,13 +244,11 @@ export const RegistrationProvider = ({ children }) => {
         if (type === 'article') setImageUrl(data.imageUrl);
         if (type === 'owner') setOwnerImageUrl(data.imageUrl);
         if (type === 'signature') setOwnerSignatureUrl(data.imageUrl);
-        if (type === 'media') setMediaUrl(data.imageUrl);
       } else {
         const errMsg = data.message || 'Image upload failed. Ensure it is a valid graphic file.';
         if (type === 'article') setUploadError(errMsg);
         if (type === 'owner') setOwnerImageError(errMsg);
         if (type === 'signature') setSignatureError(errMsg);
-        if (type === 'media') setMediaFileError(errMsg);
       }
     } catch (err) {
       console.error('Error uploading image:', err);
@@ -281,12 +256,10 @@ export const RegistrationProvider = ({ children }) => {
       if (type === 'article') setUploadError(errMsg);
       if (type === 'owner') setOwnerImageError(errMsg);
       if (type === 'signature') setSignatureError(errMsg);
-      if (type === 'media') setMediaFileError(errMsg);
     } finally {
       if (type === 'article') setUploadingImage(false);
       if (type === 'owner') setUploadingOwnerImage(false);
       if (type === 'signature') setUploadingSignature(false);
-      if (type === 'media') setUploadingMediaFile(false);
     }
   };
 
@@ -295,8 +268,6 @@ export const RegistrationProvider = ({ children }) => {
     if (
       !date || !shape || !size || !weight || !yearOfEstablishment || !mr || !rr || !conditionOfOperation || !origin || !imageUrl ||
       !ownerName || !ownerAddress || !aadharCardNumber || !panCardNumber || !ownerMobile || !ownerEmail || !ownerImageUrl || !ownerSignatureUrl ||
-      !mediaName || !mediaAddress || !mediaAadharCardNumber || !mediaPanCardNumber || !mediaMobile || !mediaEmail ||
-      !mediaType || !mediaDescription || !mediaUrl ||
       !authorityType || !authorityName || !authorityAddress || !workingCodeNumber || !authorityContact || !licenseNumber ||
       !closingScientistName || !closingScientistInstitution || !closingScientistId ||
       !openingScientistName || !openingScientistInstitution || !openingScientistId
@@ -322,17 +293,6 @@ export const RegistrationProvider = ({ children }) => {
           email: ownerEmail,
           ownerImageUrl,
           signatureUrl: ownerSignatureUrl,
-          mediaDetails: {
-            name: mediaName,
-            address: mediaAddress,
-            aadharCardNumber: mediaAadharCardNumber,
-            panCardNumber: mediaPanCardNumber,
-            mobileNumber: mediaMobile,
-            email: mediaEmail,
-            mediaType,
-            mediaDescription,
-            mediaUrl
-          }
         },
         workingAuthority: {
           authorityType,
@@ -409,7 +369,7 @@ export const RegistrationProvider = ({ children }) => {
         // Clear all form inputs
         setDate(''); setShape(''); setSize(''); setWeight(''); setYearOfEstablishment(''); setMr(''); setRr(''); setConditionOfOperation('Normal Pack'); setOrigin(''); setImageUrl('');
         setOwnerName(''); setOwnerAddress(''); setAadharCardNumber(''); setPanCardNumber(''); setOwnerMobile(''); setOwnerEmail(''); setOwnerImageUrl(''); setOwnerSignatureUrl('');
-        setMediaName(''); setMediaAddress(''); setMediaAadharCardNumber(''); setMediaPanCardNumber(''); setMediaMobile(''); setMediaEmail(''); setMediaType('Image'); setMediaDescription(''); setMediaUrl('');
+
         setAuthorityType('Company'); setAuthorityName(''); setAuthorityAddress(''); setWorkingCodeNumber(''); setAuthorityContact(''); setLicenseNumber('');
         setClosingScientistName(''); setClosingScientistInstitution(''); setClosingScientistId('');
         setOpeningScientistName(''); setOpeningScientistInstitution(''); setOpeningScientistId('');
@@ -444,8 +404,7 @@ export const RegistrationProvider = ({ children }) => {
       return date && shape && size && weight && yearOfEstablishment && mr && rr && conditionOfOperation && origin && imageUrl;
     }
     if (stepKey === 'step2') {
-      return ownerName && ownerAddress && aadharCardNumber && panCardNumber && ownerMobile && ownerEmail && ownerImageUrl && ownerSignatureUrl &&
-             mediaName && mediaAddress && mediaAadharCardNumber && mediaPanCardNumber && mediaMobile && mediaEmail && mediaType && mediaDescription && mediaUrl;
+      return ownerName && ownerAddress && aadharCardNumber && panCardNumber && ownerMobile && ownerEmail && ownerImageUrl && ownerSignatureUrl;
     }
     if (stepKey === 'step3') {
       return authorityType && authorityName && authorityAddress && workingCodeNumber && authorityContact && licenseNumber;
@@ -473,12 +432,12 @@ export const RegistrationProvider = ({ children }) => {
     application, loadingApp, dashError, wizardState, setWizardState,
     date, setDate, shape, setShape, size, setSize, weight, setWeight, yearOfEstablishment, setYearOfEstablishment, mr, setMr, rr, setRr, conditionOfOperation, setConditionOfOperation, origin, setOrigin, imageUrl, setImageUrl,
     ownerName, setOwnerName, ownerAddress, setOwnerAddress, aadharCardNumber, setAadharCardNumber, panCardNumber, setPanCardNumber, ownerMobile, setOwnerMobile, ownerEmail, setOwnerEmail, ownerImageUrl, setOwnerImageUrl, ownerSignatureUrl, setOwnerSignatureUrl,
-    mediaName, setMediaName, mediaAddress, setMediaAddress, mediaAadharCardNumber, setMediaAadharCardNumber, mediaPanCardNumber, setMediaPanCardNumber, mediaMobile, setMediaMobile, mediaEmail, setMediaEmail, mediaType, setMediaType, mediaDescription, setMediaDescription, mediaUrl, setMediaUrl,
+
     authorityType, setAuthorityType, authorityName, setAuthorityName, authorityAddress, setAuthorityAddress, workingCodeNumber, setWorkingCodeNumber, authorityContact, setAuthorityContact, licenseNumber, setLicenseNumber,
     closingScientistName, setClosingScientistName, closingScientistInstitution, setClosingScientistInstitution, closingScientistId, setClosingScientistId,
     openingScientistName, setOpeningScientistName, openingScientistInstitution, setOpeningScientistInstitution, openingScientistId, setOpeningScientistId,
     closingChemicals, packingChemicals, openingChemicals, handleChemicalChange, addChemicalField, removeChemicalField,
-    uploadingImage, uploadError, uploadingOwnerImage, ownerImageError, uploadingSignature, signatureError, uploadingMediaFile, mediaFileError,
+    uploadingImage, uploadError, uploadingOwnerImage, ownerImageError, uploadingSignature, signatureError,
     submittingForm, formError, setFormError, deletingApp,
     handleFileUpload, handleSubmitRegistration, handleDeleteApplication, startRegistration, cancelRegistration, isStepFilled,
     steps, currentStepIndex, isFormWizard

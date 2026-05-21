@@ -6,6 +6,7 @@ import { API_BASE_URL } from '../../utils/config';
 
 const SubmittedOverview = () => {
   const { application, handleDeleteApplication, deletingApp, setWizardState } = useRegistration();
+  const [generatingPDF, setGeneratingPDF] = React.useState(false);
 
   if (!application) return null;
 
@@ -65,11 +66,26 @@ const SubmittedOverview = () => {
           </div>
           {application.status === 'Approved' && (
             <button
-              onClick={() => generateCertificatePDF(application)}
-              className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-xl font-normal text-white bg-green-600 hover:bg-green-700 active:scale-95 transition-all cursor-pointer shadow-sm"
+              onClick={async () => {
+                if (generatingPDF) return;
+                setGeneratingPDF(true);
+                try {
+                  await generateCertificatePDF(application);
+                } catch (err) {
+                  console.error(err);
+                } finally {
+                  setGeneratingPDF(false);
+                }
+              }}
+              disabled={generatingPDF}
+              className="inline-flex items-center gap-2 text-xs px-4 py-2 rounded-xl font-normal text-white bg-green-600 hover:bg-green-700 active:scale-95 transition-all cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Download size={14} />
-              <span>Download Certificate</span>
+              {generatingPDF ? (
+                <RefreshCw size={14} className="animate-spin" />
+              ) : (
+                <Download size={14} />
+              )}
+              <span>{generatingPDF ? 'Generating...' : 'Download Certificate'}</span>
             </button>
           )}
         </div>
@@ -122,7 +138,7 @@ const SubmittedOverview = () => {
       {application.ownerDetails && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="p-6">
-            <SectionTitle icon={<FileText size={16} />} title="Owner & Media Details" accent="bg-blue-50" />
+            <SectionTitle icon={<FileText size={16} />} title="Owner Details" accent="bg-blue-50" />
             <div className="divide-y divide-slate-100">
               <InfoRow label="Owner Name" value={application.ownerDetails.name} />
               <InfoRow label="Owner Address" value={application.ownerDetails.address} />
@@ -133,11 +149,10 @@ const SubmittedOverview = () => {
             </div>
 
             {/* Images row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-5 mt-4 border-t border-slate-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-5 mt-4 border-t border-slate-100">
               {[
                 { url: application.ownerDetails.ownerImageUrl, label: 'Owner Photo' },
                 { url: application.ownerDetails.signatureUrl, label: 'Signature' },
-                { url: application.ownerDetails.mediaDetails?.mediaUrl, label: 'Media File' },
               ].filter(img => img.url).map((img, i) => (
                 <div key={i} className="space-y-2">
                   <span className="text-[10px] font-normal text-slate-800 uppercase tracking-widest block">{img.label}</span>
@@ -147,17 +162,6 @@ const SubmittedOverview = () => {
                 </div>
               ))}
             </div>
-
-            {/* Media details sub-section */}
-            {application.ownerDetails.mediaDetails && (
-              <div className="mt-6 pt-4 border-t border-slate-100">
-                <span className="text-[10px] font-normal text-slate-800 uppercase tracking-widest block mb-3">Media Owner Info</span>
-                <div className="divide-y divide-slate-100">
-                  <InfoRow label="Media Owner" value={application.ownerDetails.mediaDetails.name} />
-                  <InfoRow label="Media Address" value={application.ownerDetails.mediaDetails.address} />
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}

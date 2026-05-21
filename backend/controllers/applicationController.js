@@ -73,7 +73,6 @@ const submitApplication = async (req, res, next) => {
       email,
       ownerImageUrl,
       signatureUrl,
-      mediaDetails,
     } = ownerDetails;
 
     if (
@@ -84,20 +83,10 @@ const submitApplication = async (req, res, next) => {
       !mobileNumber ||
       !email ||
       !ownerImageUrl ||
-      !signatureUrl ||
-      !mediaDetails ||
-      !mediaDetails.name ||
-      !mediaDetails.address ||
-      !mediaDetails.aadharCardNumber ||
-      !mediaDetails.panCardNumber ||
-      !mediaDetails.mobileNumber ||
-      !mediaDetails.email ||
-      !mediaDetails.mediaType ||
-      !mediaDetails.mediaDescription ||
-      !mediaDetails.mediaUrl
+      !signatureUrl
     ) {
       res.status(400);
-      throw new Error('Please fill in all Step 2 Owner & Media details fields.');
+      throw new Error('Please fill in all Step 2 Owner details fields.');
     }
 
     if (
@@ -283,9 +272,6 @@ const deleteMyApplication = async (req, res, next) => {
         if (application.ownerDetails.signatureUrl) {
           deleteFile(application.ownerDetails.signatureUrl);
         }
-        if (application.ownerDetails.mediaDetails && application.ownerDetails.mediaDetails.mediaUrl) {
-          deleteFile(application.ownerDetails.mediaDetails.mediaUrl);
-        }
       }
 
       await Application.deleteOne({ user: req.user._id });
@@ -299,10 +285,42 @@ const deleteMyApplication = async (req, res, next) => {
   }
 };
 
+// @desc    Admin delete any application by ID
+// @route   DELETE /api/applications/:id
+// @access  Private/Admin
+const deleteApplicationById = async (req, res, next) => {
+  try {
+    const application = await Application.findById(req.params.id);
+    if (!application) {
+      res.status(404);
+      throw new Error('Application not found.');
+    }
+
+    // Delete associated image files from disk
+    if (application.articleDescription && application.articleDescription.imageUrl) {
+      deleteFile(application.articleDescription.imageUrl);
+    }
+    if (application.ownerDetails) {
+      if (application.ownerDetails.ownerImageUrl) {
+        deleteFile(application.ownerDetails.ownerImageUrl);
+      }
+      if (application.ownerDetails.signatureUrl) {
+        deleteFile(application.ownerDetails.signatureUrl);
+      }
+    }
+
+    await Application.deleteOne({ _id: req.params.id });
+    res.json({ message: 'Application deleted successfully by admin.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   submitApplication,
   getMyApplication,
   getAllApplications,
   updateApplicationStatus,
   deleteMyApplication,
+  deleteApplicationById,
 };

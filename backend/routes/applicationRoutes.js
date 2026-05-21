@@ -5,6 +5,7 @@ import {
   getAllApplications,
   updateApplicationStatus,
   deleteMyApplication,
+  deleteApplicationById,
 } from '../controllers/applicationController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -19,5 +20,6 @@ router.route('/my')
 // Admin specific routes
 router.route('/').get(protect, admin, getAllApplications);
 router.route('/:id/status').put(protect, admin, updateApplicationStatus);
+router.route('/:id').delete(protect, admin, deleteApplicationById);
 
 export default router;

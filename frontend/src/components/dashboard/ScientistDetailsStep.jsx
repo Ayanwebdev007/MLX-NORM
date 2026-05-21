@@ -6,10 +6,8 @@ const ScientistDetailsStep = () => {
   const {
     closingScientistName, setClosingScientistName, closingScientistInstitution, setClosingScientistInstitution, closingScientistId, setClosingScientistId,
     openingScientistName, setOpeningScientistName, openingScientistInstitution, setOpeningScientistInstitution, openingScientistId, setOpeningScientistId,
-    formError, setFormError, setWizardState
+    formError, setFormError, setWizardState, handleSubmitRegistration
   } = useRegistration();
-
-  const handleNext = (e) => { e.preventDefault(); setFormError(''); setWizardState('step5'); };
 
   const fields = [
     { label: 'Name', icon: <User size={18} />, placeholder: 'e.g. Dr. Jane Smith' },
@@ -34,7 +32,7 @@ const ScientistDetailsStep = () => {
         </div>
       )}
 
-      <form onSubmit={handleNext} className="space-y-10 mt-6">
+      <form onSubmit={handleSubmitRegistration} className="space-y-10 mt-6">
         {[
           { title: 'Closing Scientist Details', values: [closingScientistName, closingScientistInstitution, closingScientistId], setters: [setClosingScientistName, setClosingScientistInstitution, setClosingScientistId] },
           { title: 'Opening Scientist Details', values: [openingScientistName, openingScientistInstitution, openingScientistId], setters: [setOpeningScientistName, setOpeningScientistInstitution, setOpeningScientistId] },
@@ -61,7 +59,7 @@ const ScientistDetailsStep = () => {
 
         <div className="sticky bottom-0 bg-white/80 backdrop-blur-md flex items-center justify-between gap-3 pt-4 pb-2 border-t border-slate-200 select-none z-10 mt-10">
           <button type="button" onClick={() => setWizardState('step3')} className="py-3 px-6 rounded-xl border border-slate-300 hover:bg-slate-50 text-sm font-normal text-slate-900 transition-colors cursor-pointer bg-white shadow-sm">Back</button>
-          <button type="submit" className="flex items-center gap-2 py-3 px-6 rounded-xl text-sm font-normal text-white bg-green-600 hover:bg-green-700 active:scale-95 transition-all duration-150 cursor-pointer shadow-md">
+          <button type="button" onClick={() => { setFormError(''); setWizardState('step5'); }} className="flex items-center gap-2 py-3 px-6 rounded-xl text-sm font-normal text-white bg-green-600 hover:bg-green-700 active:scale-95 transition-all duration-150 cursor-pointer shadow-md">
             <span>Next Step</span><ArrowRight size={18} />
           </button>
         </div>

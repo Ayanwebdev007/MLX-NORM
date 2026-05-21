@@ -28,17 +28,6 @@ const applicationSchema = new mongoose.Schema(
       email: { type: String, required: true },
       ownerImageUrl: { type: String, required: true },
       signatureUrl: { type: String, required: true },
-      mediaDetails: {
-        name: { type: String, required: true },
-        address: { type: String, required: true },
-        aadharCardNumber: { type: String, required: true },
-        panCardNumber: { type: String, required: true },
-        mobileNumber: { type: String, required: true },
-        email: { type: String, required: true },
-        mediaType: { type: String, required: true },
-        mediaDescription: { type: String, required: true },
-        mediaUrl: { type: String, required: true },
-      },
     },
     workingAuthority: {
       authorityType: { type: String, required: true, enum: ['Company', 'Auctioneer'] },

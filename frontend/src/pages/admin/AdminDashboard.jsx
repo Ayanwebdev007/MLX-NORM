@@ -230,6 +230,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteApplication = async (appId, appName) => {
+    if (!window.confirm(`Are you sure you want to permanently delete the application for "${appName}"? This action cannot be undone.`)) return;
+    setDashError(''); setDashSuccess('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/applications/${appId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${user.token}` }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Application deletion failed');
+      setDashSuccess(`Application for "${appName}" was successfully deleted.`);
+      fetchApplications();
+      if (reviewingApp && reviewingApp._id === appId) {
+        setReviewingApp(null);
+      }
+    } catch (err) {
+      setDashError(err.message || 'An error occurred during application deletion.');
+    }
+  };
+
   const handleCloseCreateModal = () => {
     setShowCreateModal(false); setFormError(''); setFormSuccess('');
     setNewName(''); setNewEmail(''); setNewPassword('');
@@ -280,7 +300,7 @@ const AdminDashboard = () => {
 
   const reviewSteps = [
     { key: 'step1', label: 'Article Description', num: 1 },
-    { key: 'step2', label: 'Owner & Media', num: 2 },
+    { key: 'step2', label: 'Owner Details', num: 2 },
     { key: 'step3', label: 'Working Authority', num: 3 },
     { key: 'step4', label: 'Scientists', num: 4 },
     { key: 'step5', label: 'Chemicals', num: 5 },
@@ -445,10 +465,9 @@ const AdminDashboard = () => {
                   {applicationsList.map((app) => (
                     <div
                       key={app._id}
-                      onClick={() => handleOpenReview(app)}
-                      className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-green-200 hover:bg-green-50/30 transition-all duration-150 cursor-pointer group"
+                      className="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-green-200 hover:bg-green-50/30 transition-all duration-150 group"
                     >
-                      <div className="flex items-center gap-4 min-w-0">
+                      <div onClick={() => handleOpenReview(app)} className="flex items-center gap-4 min-w-0 flex-1 cursor-pointer">
                         <div className="h-11 w-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-900 text-sm font-normal shrink-0 select-none group-hover:bg-blue-100 group-hover:text-green-600 group-hover:border-green-200 transition-colors">
                           {app.user ? app.user.name.substring(0, 2).toUpperCase() : '??'}
                         </div>
@@ -467,9 +486,16 @@ const AdminDashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <StatusBadge status={app.status} />
-                        <ChevronRight size={18} className="text-slate-800 group-hover:text-blue-500 transition-colors" />
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeleteApplication(app._id, app.user?.name || 'Unknown'); }}
+                          className="text-rose-500 hover:text-rose-600 hover:bg-rose-50 p-2 rounded-lg transition-colors cursor-pointer"
+                          title="Delete Application"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                        <ChevronRight onClick={() => handleOpenReview(app)} size={18} className="text-slate-800 group-hover:text-blue-500 transition-colors cursor-pointer" />
                       </div>
                     </div>
                   ))}
@@ -512,6 +538,13 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <StatusBadge status={reviewingApp.status} />
+                <button
+                  onClick={() => handleDeleteApplication(reviewingApp._id, reviewingApp.user?.name || 'Unknown')}
+                  className="flex items-center gap-1.5 py-2 px-4 rounded-xl text-xs font-normal text-white bg-rose-600 hover:bg-rose-700 active:scale-95 transition-all duration-150 cursor-pointer shadow-sm"
+                >
+                  <Trash2 size={13} />
+                  <span>Delete</span>
+                </button>
               </div>
               {reviewingApp.adminRemarks && (
                 <div className="mt-5 p-4 rounded-xl border border-amber-100 bg-amber-50/50 text-xs text-amber-900">
@@ -591,26 +624,10 @@ const AdminDashboard = () => {
                           <DataRow label="Aadhaar Card No." value={reviewingApp.ownerDetails.aadharCardNumber} />
                           <DataRow label="PAN Card No." value={reviewingApp.ownerDetails.panCardNumber} />
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                           {reviewingApp.ownerDetails.ownerImageUrl && <ImagePreview url={reviewingApp.ownerDetails.ownerImageUrl} label="Owner Photo" />}
                           {reviewingApp.ownerDetails.signatureUrl && <ImagePreview url={reviewingApp.ownerDetails.signatureUrl} label="Signature" />}
-                          {reviewingApp.ownerDetails.mediaDetails?.mediaUrl && <ImagePreview url={reviewingApp.ownerDetails.mediaDetails.mediaUrl} label="Media File" />}
                         </div>
-                        {reviewingApp.ownerDetails.mediaDetails && (
-                          <div className="pt-4">
-                            <h3 className="text-sm font-normal text-slate-700 uppercase tracking-wider mb-4">Media Details</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                              <DataRow label="Media Owner Name" value={reviewingApp.ownerDetails.mediaDetails.name} />
-                              <DataRow label="Media Mobile" value={reviewingApp.ownerDetails.mediaDetails.mobileNumber} />
-                              <DataRow label="Media Email" value={reviewingApp.ownerDetails.mediaDetails.email} />
-                              <DataRow label="Media Address" value={reviewingApp.ownerDetails.mediaDetails.address} />
-                              <DataRow label="Media Aadhaar No." value={reviewingApp.ownerDetails.mediaDetails.aadharCardNumber} />
-                              <DataRow label="Media PAN No." value={reviewingApp.ownerDetails.mediaDetails.panCardNumber} />
-                              <DataRow label="Media Type" value={reviewingApp.ownerDetails.mediaDetails.mediaType} />
-                              <DataRow label="Media Description" value={reviewingApp.ownerDetails.mediaDetails.mediaDescription} />
-                            </div>
-                          </div>
-                        )}
                       </>
                     ) : <div className="text-center py-10 text-slate-800 italic text-sm">No owner details submitted.</div>}
                   </div>
