@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Application from '../models/Application.js';
+import { sendSubmissionSuccessEmail } from '../utils/emailService.js';
 
 // Helper to delete an uploaded file from server disk
 const deleteFile = (fileUrl) => {
@@ -164,6 +165,12 @@ const submitApplication = async (req, res, next) => {
       application.adminRemarks = ''; // Clear prior admin remarks
 
       const updatedApp = await application.save();
+
+      // Send email asynchronously
+      sendSubmissionSuccessEmail(ownerDetails.email, registrationNumber, ownerDetails.name).catch(err => {
+        console.error('Failed to send submission email via Resend:', err.message || err);
+      });
+
       res.json(updatedApp);
     } else {
       // Create new application
@@ -178,6 +185,12 @@ const submitApplication = async (req, res, next) => {
       });
 
       const createdApp = await newApp.save();
+
+      // Send email asynchronously
+      sendSubmissionSuccessEmail(ownerDetails.email, registrationNumber, ownerDetails.name).catch(err => {
+        console.error('Failed to send submission email via Resend:', err.message || err);
+      });
+
       res.status(201).json(createdApp);
     }
   } catch (error) {
